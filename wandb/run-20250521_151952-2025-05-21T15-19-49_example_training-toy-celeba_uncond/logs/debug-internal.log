@@ -1,0 +1,16 @@
+{"time":"2025-05-21T15:19:52.20897897Z","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"wandb/run-20250521_151952-2025-05-21T15-19-49_example_training-toy-celeba_uncond/logs/debug-core.log"}
+{"time":"2025-05-21T15:19:52.520500779Z","level":"INFO","msg":"created new stream","id":"2025-05-21T15-19-49_example_training-toy-celeba_uncond"}
+{"time":"2025-05-21T15:19:52.520562111Z","level":"INFO","msg":"stream: started","id":"2025-05-21T15-19-49_example_training-toy-celeba_uncond"}
+{"time":"2025-05-21T15:19:52.520582412Z","level":"INFO","msg":"writer: Do: started","stream_id":"2025-05-21T15-19-49_example_training-toy-celeba_uncond"}
+{"time":"2025-05-21T15:19:52.520634363Z","level":"INFO","msg":"sender: started","stream_id":"2025-05-21T15-19-49_example_training-toy-celeba_uncond"}
+{"time":"2025-05-21T15:19:52.520668454Z","level":"INFO","msg":"handler: started","stream_id":"2025-05-21T15-19-49_example_training-toy-celeba_uncond"}
+{"time":"2025-05-21T15:19:53.083719491Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-05-21T15:22:55.950616895Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-05-21T15:22:55.950751482Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-05-21T15:22:56.913047603Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-05-21T15:22:56.952876135Z","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading summary, console lines 160-160","runtime_seconds":0.039682695}],"total_operations":1}}
+{"time":"2025-05-21T15:22:57.491518529Z","level":"INFO","msg":"stream: closing","id":"2025-05-21T15-19-49_example_training-toy-celeba_uncond"}
+{"time":"2025-05-21T15:22:57.49154405Z","level":"INFO","msg":"handler: closed","stream_id":"2025-05-21T15-19-49_example_training-toy-celeba_uncond"}
+{"time":"2025-05-21T15:22:57.491556601Z","level":"INFO","msg":"writer: Close: closed","stream_id":"2025-05-21T15-19-49_example_training-toy-celeba_uncond"}
+{"time":"2025-05-21T15:22:57.491580892Z","level":"INFO","msg":"sender: closed","stream_id":"2025-05-21T15-19-49_example_training-toy-celeba_uncond"}
+{"time":"2025-05-21T15:22:57.491711598Z","level":"INFO","msg":"stream: closed","id":"2025-05-21T15-19-49_example_training-toy-celeba_uncond"}

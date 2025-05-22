@@ -1,0 +1,111 @@
+model:
+  base_learning_rate: 1.0e-5  # 기본 학습률
+  target: sgm.models.diffusion.DiffusionEngine  # 사용할 주요 모델 클래스
+  params:
+    scale_factor: 0.18215  # latent space에서 이미지와 원래 이미지 사이의 스케일 비율
+    disable_first_stage_autocast: True  # 첫 번째 스테이지(오토인코더)에서 autocast 비활성화 (정확도 문제 방지 목적)
+    log_keys:
+      - cls  # 로깅할 키 (ex. classification 결과 등)
+
+    scheduler_config:  # 학습률 스케줄러 설정
+      target: sgm.lr_scheduler.LambdaLinearScheduler
+      params:
+        warm_up_steps: [10000]  # 워밍업 스텝 수 (선형 증가)
+        cycle_lengths: [10000000000000]  # 스케줄러 주기 (무한 루프 방지용 매우 큰 값)
+        f_start: [1.e-6]  # 워밍업 시작 시 학습률 계수
+        f_max: [1.]  # 최대 계수
+        f_min: [1.]  # 최소 계수 (고정 스케줄일 경우)
+
+    denoiser_config:  # 노이즈 제거 네트워크 설정
+      target: sgm.modules.diffusionmodules.denoiser.Denoiser
+      params:
+        scaling_config:
+          target: sgm.modules.diffusionmodules.denoiser_scaling.EDMScaling
+          params:
+            sigma_data: 1.0  # 노이즈 정규화 파라미터 (EDM 논문 기준)
+
+    network_config:  # UNet 구조 설정
+      target: sgm.modules.diffusionmodules.openaimodel.UNetModel
+      params:
+        in_channels: 4  # 입력 채널 수 (latent space z의 채널 수)
+        out_channels: 4  # 출력 채널 수 (예측된 노이즈의 채널 수)
+        model_channels: 64  # 기본 채널 수 (모델 내부 채널 기준)
+        attention_resolutions: []  # 어떤 해상도에 attention을 쓸지 (비어있으면 attention 미사용)
+        num_res_blocks: 4  # 각 resolution stage당 residual block 개수
+        channel_mult: [1, 2, 2, 4]  # 해상도에 따라 채널 수를 곱할 비율 (64,128,128,256)
+        num_head_channels: 32  # attention head의 채널 수
+
+    first_stage_config:  # 오토인코더 (VAE) 설정
+      target: sgm.models.autoencoder.AutoencoderKL
+      params:
+        ckpt_path: "/root/generative-models/pretrained/sdxl_vae.safetensors"  # VAE의 pretrained checkpoint 경로
+        embed_dim: 4  # latent 공간의 채널 수
+        monitor: val/rec_loss  # 모니터링 지표
+        ddconfig:  # 디코더 및 인코더 네트워크 설정
+          attn_type: vanilla-xformers  # attention 타입 (xformers backend 사용)
+          double_z: true  # 인코더에서 두 개의 z벡터 (mean, logvar) 사용
+          z_channels: 4  # latent 공간의 채널 수
+          resolution: 64  # 입력 이미지 해상도
+          in_channels: 3  # 입력 이미지 채널 수 (RGB)
+          out_ch: 3  # 출력 이미지 채널 수 (RGB)
+          ch: 128  # 기본 채널 수
+          ch_mult: [1, 2, 4, 4]  # 각 stage에서의 채널 multiplier
+          num_res_blocks: 2  # 각 stage당 residual block 수
+          attn_resolutions: []  # attention 적용 해상도
+          dropout: 0.0  # 드롭아웃 비율
+        lossconfig:
+          target: torch.nn.Identity  # 학습 시 reconstruction loss를 사용하지 않음
+
+    loss_fn_config:  # 손실 함수 설정
+      target: sgm.modules.diffusionmodules.loss.StandardDiffusionLoss
+      params:
+        loss_weighting_config:
+          target: sgm.modules.diffusionmodules.loss_weighting.EDMWeighting
+          params:
+            sigma_data: 1.0  # EDM 방식에 맞춘 loss weighting 파라미터
+        sigma_sampler_config:
+          target: sgm.modules.diffusionmodules.sigma_sampling.EDMSampling  # sigma 샘플링 방식
+
+    sampler_config:  # 샘플러 설정 (샘플링 단계에서 사용)
+      target: sgm.modules.diffusionmodules.sampling.EulerEDMSampler  # Euler 방식 sampler
+      params:
+        num_steps: 50  # 샘플링 스텝 수
+        discretization_config:
+          target: sgm.modules.diffusionmodules.discretizer.EDMDiscretization  # EDM 기반의 timestep discretization 사용
+
+data:
+  target: sgm.data.celeba.CelebALoader  # 사용할 데이터 로더 클래스
+  params:
+    batch_size: 32  # 배치 크기
+    num_workers: 4  # 데이터 로딩 시 사용할 CPU 프로세스 수
+
+lightning:  # PyTorch Lightning 관련 설정
+  modelcheckpoint:
+    params:
+      every_n_train_steps: 5000  # 5000 스텝마다 체크포인트 저장
+
+  callbacks:
+    metrics_over_trainsteps_checkpoint:
+      params:
+        every_n_train_steps: 25000  # 25000 스텝마다 성능 지표 저장
+
+    image_logger:
+      target: main.ImageLogger  # 이미지 로깅 콜백 클래스
+      params:
+        disabled: False  # 로깅 활성화 여부
+        batch_frequency: 10000  # 1000 스텝마다 이미지 로깅
+        max_images: 64  # 최대 로깅 이미지 수
+        increase_log_steps: False  # 스텝마다 로그 주기 증가 여부
+        log_first_step: False  # 첫 스텝 로깅 여부
+        log_images_kwargs:
+          use_ema_scope: False  # EMA 모델 사용 여부
+          N: 64  # 로깅할 샘플 수
+          n_rows: 8  # 이미지 grid의 행 수
+
+  trainer:
+    devices: 0,  # 사용할 GPU 장치 (0번 GPU)
+    benchmark: True  # CuDNN 벤치마크 활성화 (성능 향상 가능)
+    num_sanity_val_steps: 0  # 학습 시작 전 검증 단계 비활성화
+    accumulate_grad_batches: 1  # gradient accumulation 횟수
+    max_epochs: 10  # 최대 epoch 수
+    gradient_clip_val: 1.0  # gradient clipping 값 (폭주 방지)

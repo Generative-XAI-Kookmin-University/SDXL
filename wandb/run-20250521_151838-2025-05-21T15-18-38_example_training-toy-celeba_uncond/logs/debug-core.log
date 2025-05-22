@@ -1,0 +1,15 @@
+{"time":"2025-05-21T15:18:38.159562323Z","level":"INFO","msg":"main: starting server","port-filename":"/tmp/tmp2lzfko03/port-41041.txt","pid":41041,"log-level":0,"disable-analytics":false,"shutdown-on-parent-exit":false,"enable-dcgm-profiling":false}
+{"time":"2025-05-21T15:18:38.184960023Z","level":"INFO","msg":"server is running","addr":{"IP":"127.0.0.1","Port":36017,"Zone":""}}
+{"time":"2025-05-21T15:18:38.185182169Z","level":"INFO","msg":"Will exit if parent process dies.","ppid":41041}
+{"time":"2025-05-21T15:18:38.34534973Z","level":"INFO","msg":"connection: ManageConnectionData: new connection created","id":"127.0.0.1:56394"}
+{"time":"2025-05-21T15:18:38.742075077Z","level":"INFO","msg":"handleInformInit: received","streamId":"2025-05-21T15-18-38_example_training-toy-celeba_uncond","id":"127.0.0.1:56394"}
+{"time":"2025-05-21T15:18:39.071887098Z","level":"INFO","msg":"handleInformInit: stream started","streamId":"2025-05-21T15-18-38_example_training-toy-celeba_uncond","id":"127.0.0.1:56394"}
+{"time":"2025-05-21T15:18:41.623145031Z","level":"INFO","msg":"handleInformFinish: finish message received","streamId":"2025-05-21T15-18-38_example_training-toy-celeba_uncond","id":"127.0.0.1:56394"}
+{"time":"2025-05-21T15:18:41.623343896Z","level":"INFO","msg":"handleInformFinish: stream closed","streamId":"2025-05-21T15-18-38_example_training-toy-celeba_uncond","id":"127.0.0.1:56394"}
+{"time":"2025-05-21T15:18:42.623365661Z","level":"INFO","msg":"handleInformTeardown: server teardown initiated","id":"127.0.0.1:56394"}
+{"time":"2025-05-21T15:18:42.623450703Z","level":"INFO","msg":"handleInformTeardown: server shutdown complete","id":"127.0.0.1:56394"}
+{"time":"2025-05-21T15:18:42.623459723Z","level":"INFO","msg":"server is shutting down"}
+{"time":"2025-05-21T15:18:42.623484324Z","level":"INFO","msg":"connection: closing","id":"127.0.0.1:56394"}
+{"time":"2025-05-21T15:18:42.62369585Z","level":"INFO","msg":"connection: closed successfully","id":"127.0.0.1:56394"}
+{"time":"2025-05-21T15:18:42.623732741Z","level":"INFO","msg":"connection: ManageConnectionData: connection closed","id":"127.0.0.1:56394"}
+{"time":"2025-05-21T15:18:42.623743111Z","level":"INFO","msg":"server is closed"}

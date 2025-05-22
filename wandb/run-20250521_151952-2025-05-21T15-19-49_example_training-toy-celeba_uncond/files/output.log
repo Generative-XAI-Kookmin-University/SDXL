@@ -1,0 +1,167 @@
+Merged modelckpt-cfg:
+{'target': 'pytorch_lightning.callbacks.ModelCheckpoint', 'params': {'dirpath': 'logs/2025-05-21T15-19-49_example_training-toy-celeba_uncond/checkpoints', 'filename': '{epoch:06}', 'verbose': True, 'save_last': True, 'every_n_train_steps': 5000}}
+strategy config:
+ ++++++++++++++
+ {'target': 'pytorch_lightning.strategies.DDPStrategy', 'params': {'find_unused_parameters': False}}
+ ++++++++++++++
+Caution: Saving checkpoints every n train steps without deleting. This might require some free space.
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+#### Data #####
+datasets not yet initialized.
+accumulate_grad_batches = 1
+++++ NOT USING LR SCALING ++++
+Setting learning rate to 1.00e-04
+/usr/local/lib/python3.10/dist-packages/pytorch_lightning/trainer/configuration_validator.py:70: UserWarning: You passed in a `val_dataloader` but have no `validation_step`. Skipping val loop.
+  rank_zero_warn("You passed in a `val_dataloader` but have no `validation_step`. Skipping val loop.")
+[rank: 0] Global seed set to 23
+Initializing distributed: GLOBAL_RANK: 0, MEMBER: 1/1
+----------------------------------------------------------------------------------------------------
+distributed_backend=nccl
+All distributed processes registered. Starting with 1 processes
+----------------------------------------------------------------------------------------------------
+
+You are using a CUDA device ('NVIDIA GeForce RTX 4090') that has Tensor Cores. To properly utilize them, you should set `torch.set_float32_matmul_precision('medium' | 'high')` which will trade-off precision for performance. For more details, read https://pytorch.org/docs/stable/generated/torch.set_float32_matmul_precision.html#torch.set_float32_matmul_precision
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Setting up LambdaLR scheduler...
+Project config
+model:
+  base_learning_rate: 0.0001
+  target: sgm.models.diffusion.DiffusionEngine
+  params:
+    scale_factor: 0.18215
+    disable_first_stage_autocast: true
+    log_keys:
+    - cls
+    scheduler_config:
+      target: sgm.lr_scheduler.LambdaLinearScheduler
+      params:
+        warm_up_steps:
+        - 10000
+        cycle_lengths:
+        - 10000000000000
+        f_start:
+        - 1.0e-06
+        f_max:
+        - 1.0
+        f_min:
+        - 1.0
+    denoiser_config:
+      target: sgm.modules.diffusionmodules.denoiser.Denoiser
+      params:
+        scaling_config:
+          target: sgm.modules.diffusionmodules.denoiser_scaling.EDMScaling
+          params:
+            sigma_data: 1.0
+    network_config:
+      target: sgm.modules.diffusionmodules.openaimodel.UNetModel
+      params:
+        in_channels: 4
+        out_channels: 4
+        model_channels: 64
+        attention_resolutions: []
+        num_res_blocks: 4
+        channel_mult:
+        - 1
+        - 2
+        - 2
+        - 4
+        num_head_channels: 32
+    first_stage_config:
+      target: sgm.models.autoencoder.AutoencoderKL
+      params:
+        ckpt_path: /root/generative-models/pretrained/sdxl_vae.safetensors
+        embed_dim: 4
+        monitor: val/rec_loss
+        ddconfig:
+          attn_type: vanilla-xformers
+          double_z: true
+          z_channels: 4
+          resolution: 64
+          in_channels: 3
+          out_ch: 3
+          ch: 128
+          ch_mult:
+          - 1
+          - 2
+          - 4
+          - 4
+          num_res_blocks: 2
+          attn_resolutions: []
+          dropout: 0.0
+        lossconfig:
+          target: torch.nn.Identity
+    loss_fn_config:
+      target: sgm.modules.diffusionmodules.loss.StandardDiffusionLoss
+      params:
+        loss_weighting_config:
+          target: sgm.modules.diffusionmodules.loss_weighting.EDMWeighting
+          params:
+            sigma_data: 1.0
+        sigma_sampler_config:
+          target: sgm.modules.diffusionmodules.sigma_sampling.EDMSampling
+    sampler_config:
+      target: sgm.modules.diffusionmodules.sampling.EulerEDMSampler
+      params:
+        num_steps: 50
+        discretization_config:
+          target: sgm.modules.diffusionmodules.discretizer.EDMDiscretization
+data:
+  target: sgm.data.celeba.CelebALoader
+  params:
+    batch_size: 8
+    num_workers: 4
+
+Lightning config
+modelcheckpoint:
+  params:
+    every_n_train_steps: 5000
+callbacks:
+  metrics_over_trainsteps_checkpoint:
+    params:
+      every_n_train_steps: 25000
+  image_logger:
+    target: main.ImageLogger
+    params:
+      disabled: false
+      batch_frequency: 1000
+      max_images: 64
+      increase_log_steps: false
+      log_first_step: false
+      log_images_kwargs:
+        use_ema_scope: false
+        'N': 64
+        n_rows: 8
+trainer:
+  devices: 0,
+  benchmark: true
+  num_sanity_val_steps: 0
+  accumulate_grad_batches: 1
+  max_epochs: 10
+  gradient_clip_val: 1.0
+  accelerator: gpu
+
+  | Name              | Type                  | Params
+------------------------------------------------------------
+0 | model             | OpenAIWrapper         | 28.3 M
+1 | denoiser          | Denoiser              | 0
+2 | conditioner       | GeneralConditioner    | 0
+3 | first_stage_model | AutoencoderKL         | 83.7 M
+4 | loss_fn           | StandardDiffusionLoss | 0
+------------------------------------------------------------
+28.3 M    Trainable params
+83.7 M    Non-trainable params
+111 M     Total params
+447.840   Total estimated model params size (MB)
+/usr/local/lib/python3.10/dist-packages/pytorch_lightning/trainer/connectors/data_connector.py:430: PossibleUserWarning: The dataloader, train_dataloader, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 64 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+  rank_zero_warn(
+
+Epoch 0:   3%|█▍                                             | 639/20347 [02:11<1:07:29,  4.87it/s, v_num=cond, loss=1.000, global_step=638.0, lr_abs=6.38e-6]Summoning checkpoint.
+/usr/lib/python3.10/contextlib.py:103: FutureWarning: `torch.backends.cuda.sdp_kernel()` is deprecated. In the future, this context manager will be removed. Please see `torch.nn.attention.sdpa_kernel()` for the new context manager, with updated signature.
+  self.gen = func(*args, **kwds)
+/usr/local/lib/python3.10/dist-packages/pytorch_lightning/trainer/connectors/logger_connector/result.py:212: UserWarning: You called `self.log('global_step', ...)` in your `training_step` but the value needs to be floating point. Converting it to torch.float32.
+  warning_cache.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_lightning/trainer/call.py:54: UserWarning: Detected KeyboardInterrupt, attempting graceful shutdown...
+  rank_zero_warn("Detected KeyboardInterrupt, attempting graceful shutdown...")

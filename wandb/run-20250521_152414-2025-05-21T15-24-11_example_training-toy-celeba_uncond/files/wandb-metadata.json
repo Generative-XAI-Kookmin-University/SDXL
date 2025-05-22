@@ -1,0 +1,48 @@
+{
+  "os": "Linux-6.5.0-35-generic-x86_64-with-glibc2.35",
+  "python": "CPython 3.10.12",
+  "startedAt": "2025-05-21T15:24:14.535276Z",
+  "args": [
+    "--base",
+    "configs/example_training/toy/celeba_uncond.yaml",
+    "--wandb",
+    "True"
+  ],
+  "program": "/root/generative-models/main.py",
+  "codePath": "main.py",
+  "git": {
+    "remote": "https://github.com/Stability-AI/generative-models.git",
+    "commit": "0ad7de9a5cb53fd63d6d30a4f385485e72e08597"
+  },
+  "email": "kt01054197938@gmail.com",
+  "root": ".",
+  "host": "5ec1c02caa72",
+  "executable": "/usr/bin/python3",
+  "codePathLocal": "main.py",
+  "cpu_count": 32,
+  "cpu_count_logical": 64,
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "64424509440",
+      "used": "25348485120"
+    }
+  },
+  "memory": {
+    "total": "270279802880"
+  },
+  "cpu": {
+    "count": 32,
+    "countLogical": 64
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA GeForce RTX 4090",
+      "memoryTotal": "25757220864",
+      "cudaCores": 16384,
+      "architecture": "Ada"
+    }
+  ],
+  "cudaVersion": "12.4"
+}
